@@ -11,7 +11,7 @@ declare const puter: any;
 export const generateDrafts = async (
   idea: string,
   tone: Tone,
-): Promise<GeneratedContent> => {
+): Promise<generatedContent> => {
   const prompt = `Generate social media drafts for six platforms: Instagram, Facebook, Twitter, LinkedIn, X, TikTok based on the following idea: ${idea} and tone: ${tone}
 
   Requirements:
