@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import { platformDraft, imageSize, aspectRatio } from "../types";
+import { PlatformDraft, ImageSize, AspectRatio } from "../types";
 import { generateSpeech } from "../services/puter";
 
-interface platformCardProps {
-  draft: platformDraft;
+interface PlatformCardProps {
+  draft: PlatformDraft;
   onGenerateImage: (
     platform: string,
-    AspectRatio: aspectRatio,
-    size: imageSize,
+    AspectRatio: AspectRatio,
+    size: ImageSize,
   ) => void;
   onEditContent: (platform: string, newContent: string) => void;
 }
 
-const PlatformCard: React.FC<platformCardProps> = ({
+const PlatformCard: React.FC<PlatformCardProps> = ({
   draft,
   onGenerateImage,
   onEditContent,
 }) => {
-  const [size, setSize] = useState<imageSize>(imageSize.S1K);
-  const [ratio, setRatio] = useState<aspectRatio>(draft.suggestedAspectRatio);
+  const [size, setSize] = useState<ImageSize>(ImageSize.S1K);
+  const [ratio, setRatio] = useState<AspectRatio>(draft.suggestedAspectRatio);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleDownload = () => {
@@ -84,7 +84,7 @@ const PlatformCard: React.FC<platformCardProps> = ({
               </label>
               <select
                 value={ratio}
-                onChange={(e) => setRatio(e.target.value as aspectRatio)}
+                onChange={(e) => setRatio(e.target.value as AspectRatio)}
                 className="w-full bg-[#0d1411] border border-white/5 text-slate-400 text-[10px] font-bold p-3 outline-none focus:border-emerald-500/30 transition-colors appearance-none mono"
               >
                 {[
@@ -111,16 +111,16 @@ const PlatformCard: React.FC<platformCardProps> = ({
               </label>
               <select
                 value={size}
-                onChange={(e) => setSize(e.target.value as imageSize)}
+                onChange={(e) => setSize(e.target.value as ImageSize)}
                 className="w-full bg-[#0d1411] border border-white/5 text-slate-400 text-[10px] font-bold p-3 outline-none focus:border-emerald-500/30 transition-colors appearance-none mono"
               >
-                <option value={imageSize.S1K} className="bg-black">
+                <option value={ImageSize.S1K} className="bg-black">
                   1024PX
                 </option>
-                <option value={imageSize.S2K} className="bg-black">
+                <option value={ImageSize.S2K} className="bg-black">
                   2048PX
                 </option>
-                <option value={imageSize.S4K} className="bg-black">
+                <option value={ImageSize.S4K} className="bg-black">
                   4096PX
                 </option>
               </select>
