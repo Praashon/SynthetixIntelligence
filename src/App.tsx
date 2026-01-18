@@ -6,7 +6,7 @@ import {
   checkAuth,
   signIn,
 } from "./services/puter";
-import { generateDraftsGemini, generateImageGemini } from "./services/gemini";
+import { generateDraftsGemini } from "./services/gemini";
 import PlatformCard from "./components/PlatformCard";
 import AuthModal from "./components/AuthModal";
 import ApiKeyModal from "./components/ApiKeyModal";
@@ -238,6 +238,11 @@ const App: React.FC = () => {
     AspectRatio: AspectRatio,
     size: ImageSize,
   ) => {
+    if (authMode === "gemini") {
+      alert("Image generation is disabled in free tier mode.");
+      return;
+    }
+
     const draftIndex = drafts.findIndex((d) => d.platform === platform);
     if (draftIndex === -1) return;
 
@@ -248,31 +253,11 @@ const App: React.FC = () => {
     );
 
     try {
-      let imageUrl;
-      if (authMode === "gemini") {
-        const key = localStorage.getItem("gemini_api_key");
-        if (!key) {
-          setDrafts((prev) =>
-            prev.map((d, i) =>
-              i === draftIndex ? { ...d, isGeneratingImage: false } : d,
-            ),
-          );
-          return;
-        }
-        imageUrl = await generateImageGemini(
-          drafts[draftIndex].content,
-          AspectRatio,
-          size,
-          key,
-        );
-        setSessionUsage((prev) => prev + 1);
-      } else {
-        imageUrl = await generatePlatformImage(
-          drafts[draftIndex].content,
-          AspectRatio,
-          size,
-        );
-      }
+      const imageUrl = await generatePlatformImage(
+        drafts[draftIndex].content,
+        AspectRatio,
+        size,
+      );
 
       setDrafts((prev) =>
         prev.map((d, i) =>
