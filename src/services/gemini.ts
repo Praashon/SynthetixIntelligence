@@ -67,7 +67,7 @@ export const generateDraftsGemini = async (
   try {
     let data;
     try {
-      data = await makeRequest("gemini-2.0-flash");
+      data = await makeRequest("gemini-2.0-flash-exp");
     } catch (e) {
       console.warn("Gemini 2.0 Flash failed, trying 1.5 Flash", e);
       data = await makeRequest("gemini-1.5-flash");
