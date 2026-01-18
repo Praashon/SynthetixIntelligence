@@ -60,7 +60,24 @@ export const generateDraftsGemini = async (
     ]
   }`;
 
-  const makeRequest = async (model: string) => {
+  const makeRequest = async (model: string, useTools: boolean = true) => {
+    const payload: any = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+
+    if (useTools) {
+      payload.tools = [
+        {
+          google_search_retrieval: {
+            dynamic_retrieval_config: {
+              mode: "dynamic",
+              dynamic_threshold: 0.7,
+            },
+          },
+        },
+      ];
+    }
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
@@ -68,19 +85,7 @@ export const generateDraftsGemini = async (
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          tools: [
-            {
-              google_search_retrieval: {
-                dynamic_retrieval_config: {
-                  mode: "dynamic",
-                  dynamic_threshold: 0.7,
-                },
-              },
-            },
-          ],
-        }),
+        body: JSON.stringify(payload),
       },
     );
 
@@ -95,12 +100,18 @@ export const generateDraftsGemini = async (
   try {
     let data;
     try {
-      data = await makeRequest("gemini-2.0-flash");
-    } catch {
+      data = await makeRequest("gemini-2.0-flash", true);
+    } catch (e1) {
       try {
-        data = await makeRequest("gemini-1.5-flash");
-      } catch {
-        data = await makeRequest("gemini-pro");
+        data = await makeRequest("gemini-1.5-flash", true);
+      } catch (e2) {
+        try {
+          // Fallback: No Tools (Standard Text Gen) - High Success Rate
+          data = await makeRequest("gemini-1.5-flash", false);
+        } catch (e3) {
+          // Final Fallback: Legacy Stable Model (No Tools)
+          data = await makeRequest("gemini-pro", false);
+        }
       }
     }
 
