@@ -6,13 +6,13 @@ import {
   checkAuth,
   signIn,
 } from "./services/puter";
-import { generateDraftsGemini } from "./services/gemini";
+import { generateDraftsOpenRouter } from "./services/openrouter";
 import PlatformCard from "./components/PlatformCard";
 import AuthModal from "./components/AuthModal";
 import ApiKeyModal from "./components/ApiKeyModal";
 import WarningBanner from "./components/WarningBanner";
 
-type AuthMode = "checking" | "puter" | "gemini" | "guest";
+type AuthMode = "checking" | "puter" | "openrouter" | "guest";
 
 const App: React.FC = () => {
   const [idea, setIdea] = useState("");
@@ -178,23 +178,22 @@ const App: React.FC = () => {
 
   const handleLogin = async () => {
     await signIn();
-    // Puter sign in usually reloads or handles auth, but let's reconfirm
     const isSignedIn = await checkAuth();
     if (isSignedIn) setAuthMode("puter");
   };
 
   const handleFallback = () => {
-    const storedKey = localStorage.getItem("gemini_api_key");
+    const storedKey = localStorage.getItem("openrouter_api_key");
     if (storedKey) {
-      setAuthMode("gemini");
+      setAuthMode("openrouter");
     } else {
-      setAuthMode("gemini");
+      setAuthMode("openrouter");
       setShowApiKeyModal(true);
     }
   };
 
   const handleApiKeySubmit = (key: string) => {
-    localStorage.setItem("gemini_api_key", key);
+    localStorage.setItem("openrouter_api_key", key);
     setShowApiKeyModal(false);
   };
 
@@ -205,14 +204,14 @@ const App: React.FC = () => {
       let result;
       if (authMode === "puter") {
         result = await generateDrafts(idea, tone);
-      } else if (authMode === "gemini") {
-        const key = localStorage.getItem("gemini_api_key");
+      } else if (authMode === "openrouter") {
+        const key = localStorage.getItem("openrouter_api_key");
         if (!key) {
           setShowApiKeyModal(true);
           setIsLoading(false);
           return;
         }
-        result = await generateDraftsGemini(idea, tone, key);
+        result = await generateDraftsOpenRouter(idea, tone, key);
         setSessionUsage((prev) => prev + 1);
       }
 
@@ -238,7 +237,7 @@ const App: React.FC = () => {
     AspectRatio: AspectRatio,
     size: ImageSize,
   ) => {
-    if (authMode === "gemini") {
+    if (authMode === "openrouter") {
       alert("Image generation is disabled in free tier mode.");
       return;
     }
@@ -291,13 +290,13 @@ const App: React.FC = () => {
         <AuthModal onLogin={handleLogin} onFallback={handleFallback} />
       )}
 
-      {authMode === "gemini" && showApiKeyModal && (
+      {authMode === "openrouter" && showApiKeyModal && (
         <ApiKeyModal onSubmit={handleApiKeySubmit} />
       )}
 
-      {authMode === "gemini" && <WarningBanner />}
+      {authMode === "openrouter" && <WarningBanner />}
 
-      {authMode === "gemini" && (
+      {authMode === "openrouter" && (
         <div className="fixed top-4 right-4 z-50">
           <div className="bg-[#0a0f0d] border border-emerald-900/30 px-4 py-2 rounded shadow-2xl backdrop-blur-md">
             <div className="flex flex-col items-end">
